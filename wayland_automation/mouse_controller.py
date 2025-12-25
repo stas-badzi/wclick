@@ -132,7 +132,7 @@ class Mouse:
         # Send frame event after motion
         self.send_message(self.current_virtual_pointer_id, 4, b'')
         
-    def send_click(self, button):
+    def send_click(self, button, seconds):
         # Send press then release events for the given button, each followed by a frame.
         self.send_message(
             self.current_virtual_pointer_id, 
@@ -140,6 +140,8 @@ class Mouse:
             struct.pack(f"{self.endianness}III", 0, button, 1)
         )
         self.send_message(self.current_virtual_pointer_id, 4, b'')  # Frame after press
+        if not seconds == 0:
+            time.sleep(seconds)
         self.send_message(
             self.current_virtual_pointer_id, 
             2, 
@@ -147,7 +149,7 @@ class Mouse:
         )
         self.send_message(self.current_virtual_pointer_id, 4, b'')  # Frame after release
 
-    def click(self, x, y, button=None):
+    def click(self, x, y, button=None, seconds=0):
         """
         Moves the pointer to (x, y) and, if button is specified, performs a click.
         """
@@ -168,7 +170,7 @@ class Mouse:
                     return
             else:
                 button_code = int(button)
-            self.send_click(button_code)
+            self.send_click(button_code,seconds)
 
         self.send_sync_request()
         self.handle_events()
